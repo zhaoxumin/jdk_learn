@@ -19,6 +19,9 @@ public class KeyWord_Transient {
 
         SerializeUser2();
         DeSerializeUser2();
+
+        SerializeUser3();
+        DeSerializeUser3();
     }
 
     private static void SerializeUser() throws FileNotFoundException, IOException,
@@ -89,5 +92,39 @@ public class KeyWord_Transient {
         System.out.println( "添加了transient关键字反序列化：name= " + newUser.getName() );
     }
 
+    //3、静态变量能被序列化吗？没被transient关键字修饰之后呢？
+    //
+    //这个我可以提前先告诉结果，静态变量是不会被序列化的，即使没有transient关键字修饰。下面去验证一下，然后再解释原因。
+    //
+    //首先，在User3类中对age属性添加transient关键字和static关键字修饰。
 
+    //结果已经很明显了。现在解释一下，为什么会是这样，其实在前面已经提到过了。因为静态变量在全局区,本来流里面就没有写入静态变量,
+    // 我打印静态变量当然会去全局区查找,而我们的序列化是写到磁盘上的，所以JVM查找这个静态变量的值，是从全局区查找的，而不是磁盘上。
+    // user.setAge(26);年龄改成26之后，被写到了全局区，其实就是方法区，只不过被所有的线程共享的一块空间。因此可以总结一句话：
+    //
+    //静态变量不管是不是transient关键字修饰，都不会被序列化
+
+    private static void SerializeUser3() throws FileNotFoundException, IOException,
+            ClassCastException {
+        User3 user = User3.builder()
+                .name( "jdk关键字transient" ).build();
+        User3.setAge( 26 );
+        ObjectOutputStream oos =
+                new ObjectOutputStream( new FileOutputStream( "E://template" ) );
+        oos.writeObject( user );
+        oos.close();
+        System.out.println( "添加了transient关键字序列化：age = " + User3.getAge() );
+    }
+
+    private static void DeSerializeUser3() throws IOException, ClassNotFoundException {
+        File file = new File( "E://template" );
+        ObjectInputStream ois = new ObjectInputStream( new FileInputStream( file ) );
+        User3 newUser = (User3) ois.readObject();
+        System.out.println( "添加了transient关键字反序列化：age= " + User3.getAge() );
+    }
+
+    //三、transient关键字总结
+    //
+    //java 的transient关键字为我们提供了便利，你只需要实现Serilizable接口，
+    // 将不需要序列化的属性前添加关键字transient，序列化对象的时候，这个属性就不会序列化到指定的目的地中
 }
