@@ -67,7 +67,7 @@ public class KeyWord_Transient {
     //
     //首先我们定义User2类：这个类是被Externalizable接口修饰的
 
-    
+
     //结果基本上验证了我们的猜想，也就是说，实现了Externalizable接口，
     // 哪一个属性被序列化使我们手动去指定的，即使是transient关键字修饰也不起作用。
 
