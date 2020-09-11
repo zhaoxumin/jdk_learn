@@ -31,7 +31,7 @@ public class SpinLock {
         //利用CAS
         while (!ar.compareAndSet( null,thread )){
 
-            System.out.println( thread );
+            System.out.println( thread+"锁住了哦==============" );
             //todo  DO nothing
         }
     }
